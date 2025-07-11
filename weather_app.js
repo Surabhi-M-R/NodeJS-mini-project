@@ -1,5 +1,5 @@
 import readline from 'readline/promises'
-
+// visit website weather api for api key and base url 
 const API_KEy ='';
 const BASE_KEY='';
 
@@ -29,7 +29,7 @@ const getWeather= async (city)=>{
     }
 }
 
-const city=rl.question(" Enter your city to check weather");
+const city= await rl.question(" Enter your city to check weather");
 await getWeather(city);
 rl.close();
 
