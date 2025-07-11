@@ -8,3 +8,10 @@ const rl=readline.createInterface({
     output:process.stdout
 });
 
+const getWeather= async (city)=>{
+    const url=`${BASE_KEY}?q=${city}&appid=${API_KEy}&units=metric`;
+}
+
+const city=rl.question(" Enter your city to check weather");
+await getWeather(city);
+rl.close();
