@@ -18,10 +18,22 @@
                 <label for="shortCode">Enter shortCode </label>
                 <input type="text" name="shortCode" id="shortCode" required>
             </div>
-            <h2> Shortned URLs</h2>
-            <ul id="shortned-urls"></ul>
             <button>Submit</button>
         </form>
+        <h2> Shortned URLs</h2>
+            <ul id="shortned-urls"></ul>
     </div>
+    <script>
+        document.getElementById('shortner-form').addEventListener('submit',(event)=>{
+            event.preventDefault(); // prevents from default page reload 
+
+            const formData= new FormData(event.target); // this is a new method for getting data present inside the form 
+            const url =formData.get('url');
+            const shortCode=formData.get('shortCode');
+            console.log(url,shortCode); 
+
+        })
+    </script>
+
 </body>
 </html>
