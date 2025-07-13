@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL shortner</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1> URL Shortner </h1>
+        <form id="shortner-form" >
+            <div>
+                <label for="url">Enter URL </label>
+                <input type="url" name="url" id="url" required>
+            </div>
+            <div>
+                <label for="shortCode">Enter shortCode </label>
+                <input type="text" name="shortCode" id="shortCode" required>
+            </div>
+            <h2> Shortned URLs</h2>
+            <ul id="shortned-urls"></ul>
+            <button>Submit</button>
+        </form>
+    </div>
+</body>
+</html>
