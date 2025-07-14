@@ -32,8 +32,8 @@ const loadLinks=async ()=>{
     }
 }
 
-const saveLinks=()=>{
-    await writeFile
+const saveLinks=async (links)=>{
+    await writeFile(DATA_FILE,JSON.stringify(links));
 }
 
 const server =createServer(async (req, res)=>{
@@ -66,6 +66,8 @@ const server =createServer(async (req, res)=>{
                 }
                 links[finalShortCode]=url;
                 await saveLinks(links);
+                res.writeHead(200,{"Content-Type":"application/json"});
+                res.end(JSON.stringify({sucess:true,shortCode:finalShortCode}))
             })
 
 
