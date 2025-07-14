@@ -1,8 +1,11 @@
 import { readFile } from 'fs/promises';
 import { createServer } from 'http';
+import {crypto} from "crypto";
 
 import path from 'path';
+import { writeFile } from 'fs';
 const PORT=3005;
+const DATA_FILE=path.join("data",'links.json');
 
 const serveFile= async(res, filePath, contentType )=>{
     try {
@@ -11,24 +14,62 @@ const serveFile= async(res, filePath, contentType )=>{
                 res.end(data);
                 
             } catch (error) {
-                res.writeHead(404,{"Content-Type":contentType});
+                res.writeHead(404,{"Content-Type":"text/plain"});
                 res.end(" 404 page not found ");
             }
 };
+const loadLinks=async ()=>{
+    try {
+        const data=await readFile(DATA_FILE,'utf-8');
+        return json.parse(data);
+    } catch (error) {
+
+        if(error.code==="ENOENT"){
+            await writeFile(DATA_FILE,JSON.stringify({}));
+            return {};
+        }
+        throw error;
+    }
+}
+
+const saveLinks=()=>{
+    await writeFile
+}
 
 const server =createServer(async (req, res)=>{
     if(req.method==="GET"){
         if(req.url==="/"){  
             return serveFile(res, path.join("public","index.html"), "text/html")
-        }else if(req.method==='GET'){
-            if(req.url==='/style.css'){
+        }else if(req.url==='/style.css'){
             return serveFile(res, path.join("public","style.css"),"text/css");
             }
         }
+        if(req.method==='POST' && req.url==="/shorten"){
+            const links =await loadLinks();
+            const body="";
+            req.on("data",(chunk)={
+                body=body+chunk;
 
-        
+            });
+            req.on("end",()=>{
+                console.log(body);
+                const {url,shortCode}=JSON.parse(body);
+                if(!url){
+                    res.writeHead(400,{"Content-Type":"text/plain"});
+                    return res.end(" URL is required");
+                }
+                const finalShortCode =shortCode || crypto.randomBytes(4).toString("hex");
+                
+                if(links[finalShortCode]){
+                    res.writeHead(400,{"Content-Type":"text/plain"});
+                    return res.end(" Short code already exists. Please choose another ");
+                }
+                links[finalShortCode]=url;
+                await saveLinks(links);
+            })
 
-    }
+
+        }
 })
 server.listen(PORT,()=>{
     console.log(`server is running at https://localhost:${PORT}`);
