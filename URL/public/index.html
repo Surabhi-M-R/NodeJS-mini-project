@@ -1,83 +1,3 @@
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL shortner</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <div class="container">
-        <h1> URL Shortner </h1>
-        <form id="shortner-form" >
-            <div>
-                <label for="url">Enter URL </label>
-                <input type="url" name="url" id="url" required>
-            </div>
-            <div>
-                <label for="shortCode">Enter shortCode </label>
-                <input type="text" name="shortCode" id="shortCode" required>
-            </div>
-            <button>Submit</button>
-        </form>
-        <h2> Shortned URLs</h2>
-            <ul id="shortned-urls"></ul>
-    </div>
-    <script>
-            const fetchShortnedURL= async ()=>{
-                const response = await fetch("/links");
-                const links=await response.json();
-                console.log("links",links);
-                const list = document.getElementById("shortened-urls");
-                list.innerHTML="";
-
-                for (const[shortCode,url] of Object.entries(object1)){
-                    const li=document.createElement('li');
-                    const truncatedURL =url.length>=30?`${url.slice(0,30)}...`:url;
-                    li.innerHTML=`<a href="/${shortCode}" target="_blank">${window.location.origin}/${shortCode}</a>-${truncatedURL}`
-                    list.appendChild(li);
-                    
-                }
-
-            }
-
-
-        document.getElementById('shortner-form').addEventListener('submit', async (event)=>{
-            event.preventDefault(); // prevents from default page reload 
-
-            const formData= new FormData(event.target); // this is a new method for getting data present inside the form 
-            const url =formData.get('url');
-            const shortCode=formData.get('shortCode');
-            console.log(url,shortCode); 
-
-            try{
-                const response=    await fetch("/shorten",{
-                method :"POST",
-                headers :{"Content-Type":"application/json"},
-                body:JSON.stringify({url,shortCode})
-                });
-                if(response.ok){
-                    fetchShortnedURL();
-                    alert(" form submitted successfully");
-                    event.target.reset();
-                }else{
-                    const errorMessage= await response.text();
-                    alert(errorMessage);
-                }
-
-            }catch(error){
-                console.log(error );
-            }
-        })
-        fetchShortnedURL
-
-    </script>
-
-</body>
-</html> -->
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -100,43 +20,14 @@
             </div>
             <button type="submit">Submit</button>
         </form>
-        <h2>Shortened URLs</h2>
-        <ul id="shortened-urls"></ul>
+        
+        <div id="recent-url-container" style="display: none; margin-top: 20px;">
+            <h2>Your Short URL</h2>
+            <div id="recent-url"></div>
+            <button id="copy-btn">Copy</button>
+        </div>
     </div>
     <script>
-        const fetchShortenedURLs = async () => {
-            try {
-                const response = await fetch("/links");
-                const links = await response.json();
-                const list = document.getElementById("shortened-urls");
-                list.innerHTML = "";
-
-                for (const [shortCode, url] of Object.entries(links)) {
-                    const li = document.createElement('li');
-                    const truncatedURL = url.length >= 30 ? `${url.slice(0, 30)}...` : url;
-                    li.innerHTML = `
-                        <a href="/${shortCode}" target="_blank">${window.location.origin}/${shortCode}</a> → 
-                        <span title="${url}">${truncatedURL}</span>
-                        <button class="copy-btn" data-url="${window.location.origin}/${shortCode}">Copy</button>
-                    `;
-                    list.appendChild(li);
-                }
-
-                // Add event listeners to copy buttons
-                document.querySelectorAll('.copy-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        navigator.clipboard.writeText(e.target.dataset.url);
-                        e.target.textContent = 'Copied!';
-                        setTimeout(() => {
-                            e.target.textContent = 'Copy';
-                        }, 2000);
-                    });
-                });
-            } catch (error) {
-                console.error("Error fetching shortened URLs:", error);
-            }
-        };
-
         document.getElementById('shortener-form').addEventListener('submit', async (event) => {
             event.preventDefault();
             
@@ -154,8 +45,22 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    await fetchShortenedURLs();
-                    alert(`Short URL created: ${result.shortUrl}`);
+                
+                    const container = document.getElementById('recent-url-container');
+                    const display = document.getElementById('recent-url');
+                    
+                    display.innerHTML = `
+                        <a href="${result.shortUrl}" target="_blank">${result.shortUrl}</a>
+                        <br><small>Redirects to: ${url}</small>
+                    `;
+                    container.style.display = 'block';
+                    
+                 
+                    document.getElementById('copy-btn').onclick = () => {
+                        navigator.clipboard.writeText(result.shortUrl);
+                        alert('Copied to clipboard!');
+                    };
+                    
                     event.target.reset();
                 } else {
                     alert(result.error || "Failed to create short URL");
@@ -165,9 +70,6 @@
                 alert("An error occurred while shortening the URL");
             }
         });
-
-        // Initial load
-        fetchShortenedURLs();
     </script>
 </body>
 </html>
