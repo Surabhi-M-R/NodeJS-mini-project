@@ -1,78 +1,32 @@
- !DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL Shortener</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>URL Shortener</title>
+  <link rel="stylesheet" href="/style.css" />
 </head>
 <body>
-    <div class="container">
-        <h1>URL Shortener</h1>
-        <form action="/" method="post">
-            <div>
-                <label for="url">Enter URL</label>
-                <input type="url" name="url" id="url" required>
-            </div>
-            <div>
-                <label for="shortCode">Custom Short Code (optional)</label>
-                <input type="text" name="shortCode" id="shortCode">
-            </div>
-            <button type="submit">Submit</button>
-        </form>
-        
-        <div id="recent-url-container" style="display: none; margin-top: 20px;">
-            <h2>Your Short URL</h2>
-            <div id="recent-url"></div>
-            <button id="copy-btn">Copy</button>
-            <ul>
-                {{shortened_urls}}
-            </ul>
-        </div>
+  <div class="container">
+    <h1>URL Shortener</h1>
+    <form action="/" method="POST">
+      <div>
+        <label for="url">Enter URL</label>
+        <input type="url" name="url" id="url" required />
+      </div>
+      <div>
+        <label for="shortCode">Custom Short Code (optional)</label>
+        <input type="text" name="shortCode" id="shortCode" />
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+
+    <div id="recent-url-container" style="margin-top: 20px;">
+      <h2>All Shortened URLs</h2>
+      <ul>
+        {{shortened_urls}}
+      </ul>
     </div>
-    <script>
-        <!-- document.getElementById('shortener-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            const url = formData.get('url');
-            const shortCode = formData.get('shortCode') || undefined;
-
-            try {
-                const response = await fetch("/shorten", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ url, shortCode })
-                });
-
-                const result = await response.json();
-                
-                if (response.ok) {
-                
-                    const container = document.getElementById('recent-url-container');
-                    const display = document.getElementById('recent-url');
-                    
-                    display.innerHTML = `
-                        <a href="${result.shortUrl}" target="_blank">${result.shortUrl}</a>
-                        <br><small>Redirects to: ${url}</small>
-                    `;
-                    container.style.display = 'block';
-                    
-                 
-                    document.getElementById('copy-btn').onclick = () => {
-                        navigator.clipboard.writeText(result.shortUrl);
-                        alert('Copied to clipboard!');
-                    };
-                    
-                    event.target.reset();
-                } else {
-                    alert(result.error || "Failed to create short URL");
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("An error occurred while shortening the URL");
-            }
-        }); -->
-    </script>
+  </div>
 </body>
 </html>

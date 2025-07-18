@@ -1,33 +1,23 @@
+import express from 'express';
 import { readFile, writeFile } from 'fs/promises';
-import { createServer } from 'http';
-import crypto from 'crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import express from 'express';
+import crypto from 'crypto';
 
-const app=express();
-
-
+const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const PORT = 3005;
 const DATA_FILE = path.join(__dirname, "data", "links.json");
 const PUBLIC_DIR = path.join(__dirname, "public");
-app.use(express.static("public"));
+const VIEWS_DIR = path.join(__dirname, "views");
 
-const serveFile = async (res, filePath, contentType) => {
-    try {
-        const data = await readFile(filePath);
-        res.writeHead(200, { "Content-Type": contentType });
-        res.end(data);
-    } catch (error) {
-        res.writeHead(404, { "Content-Type": "text/plain" });
-        res.end("404 page not found");
-    }
-};
+app.use(express.static(PUBLIC_DIR));
+app.use(express.urlencoded({ extended: true })); // for form data
 
+// Load stored links
 const loadLinks = async () => {
     try {
         const data = await readFile(DATA_FILE, 'utf-8');
@@ -41,41 +31,63 @@ const loadLinks = async () => {
     }
 };
 
+// Save updated links
 const saveLinks = async (links) => {
     await writeFile(DATA_FILE, JSON.stringify(links, null, 2));
 };
 
-app.get("/", async(res,req)=>{
+// Serve form and previously shortened links
+app.get("/", async (req, res) => {
     try {
-       const file =await fs.readFile(path.join("views","index.html")) ;
-        const links= await loadLinks();
-    } catch (error) {
-        console.error(err);
-        return res.status(500).send(" Internal server error");
-    }
-})
+        const filePath = path.join(VIEWS_DIR, "index.html");
+        const file = await readFile(filePath, "utf-8");
+        const links = await loadLinks();
 
-app.post("/", async(res,req)=>{
+        const shortenedUrls = Object.entries(links).map(([code, url]) => {
+            return `<li><a href="/${code}" target="_blank">${req.headers.host}/${code}</a> - ${url}</li>`;
+        }).join("");
+
+        const content = file.replace("{{shortened_urls}}", shortenedUrls);
+        res.send(content);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+// Handle form submission
+app.post("/", async (req, res) => {
     try {
-       const { url, shortCode } = req.body; 
-       const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
+        const { url, shortCode } = req.body;
+        const links = await loadLinks();
 
-                if (links[finalShortCode]) {
-                    res.status(400).send(' Short code already exist . please choose another');
+        const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
 
-                }
-                links[finalShortCode] = url;
-                await saveLinks(links);
+        if (links[finalShortCode]) {
+            return res.status(400).send("Short code already exists. Please choose another.");
+        }
 
-                const content =file.toString().replaceAll("{{shortened_urls}}",Object.entries(links).map([shortCode,url])=>{`<li><a href="/${shortCode}" target="_blank">${req.host}/${shortCode}</a>- ${url}</li>`}).join(""));
-                return res.send(content);
-    } catch (error) {
+        links[finalShortCode] = url;
+        await saveLinks(links);
+
+        res.redirect("/");
+    } catch (err) {
         console.error(err);
-        return res.status(500).send(" INternal server error ");
+        res.status(500).send("Internal Server Error");
     }
-})
+});
 
+// Redirect to the original URL
+app.get("/:code", async (req, res) => {
+    const links = await loadLinks();
+    const code = req.params.code;
 
+    if (links[code]) {
+        return res.redirect(links[code]);
+    }
+
+    res.status(404).send("Short URL not found");
+});
 
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
