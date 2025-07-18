@@ -55,79 +55,28 @@ app.get("/", async(res,req)=>{
     }
 })
 
-const server = createServer(async (req, res) => {
-    if (req.method === "GET") {
-        if (req.url === "/") {
-            return serveFile(res, path.join(PUBLIC_DIR, "index.html"), "text/html");
-        } else if (req.url === "/style.css") {
-            return serveFile(res, path.join(PUBLIC_DIR, "style.css"), "text/css");
-        } else if (req.url === '/links') {
-            try {
-                const links = await loadLinks();
-                const entries = Object.entries(links);
-                const mostRecent = entries.length > 0 ? entries[entries.length - 1] : null;
-
-                res.writeHead(200, { "Content-Type": "application/json" });
-                return res.end(JSON.stringify(mostRecent ? {
-                    [mostRecent[0]]: mostRecent[1]
-                } : {}));
-            } catch (error) {
-                res.writeHead(500, { "Content-Type": "text/plain" });
-                return res.end("Internal Server Error");
-            }
-        } else {
-            const links = await loadLinks();
-            const shortCode = req.url.slice(1);
-            if (links[shortCode]) {
-                res.writeHead(302, { Location: links[shortCode] });
-                return res.end();
-            }
-            res.writeHead(404, { "Content-Type": "text/plain" });
-            return res.end("404 - Short URL not found");
-        }
-    }
-
-    if (req.method === "POST" && req.url === "/shorten") {
-        let body = "";
-        req.on("data", (chunk) => {
-            body += chunk;
-        });
-
-        req.on("end", async () => {
-            try {
-                const { url, shortCode } = JSON.parse(body);
-                const links = await loadLinks();
-
-                if (!url) {
-                    res.writeHead(400, { "Content-Type": "application/json" });
-                    return res.end(JSON.stringify({ error: "URL is required" }));
-                }
-
-                const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
+app.post("/", async(res,req)=>{
+    try {
+       const { url, shortCode } = req.body; 
+       const finalShortCode = shortCode || crypto.randomBytes(4).toString("hex");
 
                 if (links[finalShortCode]) {
-                    res.writeHead(409, { "Content-Type": "application/json" });
-                    return res.end(JSON.stringify({ error: "Short code already exists" }));
-                }
+                    res.status(400).send(' Short code already exist . please choose another');
 
+                }
                 links[finalShortCode] = url;
                 await saveLinks(links);
 
-                res.writeHead(200, { "Content-Type": "application/json" });
-                res.end(JSON.stringify({
-                    success: true,
-                    shortCode: finalShortCode,
-                    shortUrl: `http://localhost:${PORT}/${finalShortCode}`
-                }));
-            } catch (err) {
-                res.writeHead(500, { "Content-Type": "application/json" });
-                res.end(JSON.stringify({ error: "Internal Server Error" }));
-                console.error("Error:", err);
-            }
-        });
+                const content =file.toString().replaceAll("{{shortened_urls}}",Object.entries(links).map([shortCode,url])=>{`<li><a href="/${shortCode}" target="_blank">${req.host}/${shortCode}</a>- ${url}</li>`}).join(""));
+                return res.send(content);
+    } catch (error) {
+        console.error(err);
+        return res.status(500).send(" INternal server error ");
     }
-});
+})
 
-server.listen(PORT, () => {
+
+
+app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
