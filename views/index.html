@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ !DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <h1>URL Shortener</h1>
-        <form id="shortener-form">
+        <form action="/" method="post">
             <div>
                 <label for="url">Enter URL</label>
                 <input type="url" name="url" id="url" required>
@@ -25,10 +25,13 @@
             <h2>Your Short URL</h2>
             <div id="recent-url"></div>
             <button id="copy-btn">Copy</button>
+            <ul>
+                {{shortened_urls}}
+            </ul>
         </div>
     </div>
     <script>
-        document.getElementById('shortener-form').addEventListener('submit', async (event) => {
+        <!-- document.getElementById('shortener-form').addEventListener('submit', async (event) => {
             event.preventDefault();
             
             const formData = new FormData(event.target);
@@ -69,7 +72,7 @@
                 console.error("Error:", error);
                 alert("An error occurred while shortening the URL");
             }
-        });
+        }); -->
     </script>
 </body>
 </html>

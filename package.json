@@ -1,5 +1,5 @@
 {
-  "name": "node-js-mini-project",
+  "name": "js-mini-project",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,5 +12,14 @@
   "type": "module",
   "dependencies": {
     "nodemon": "^3.1.10"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Surabhi-M-R/NodeJS-mini-project.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Surabhi-M-R/NodeJS-mini-project/issues"
+  },
+  "homepage": "https://github.com/Surabhi-M-R/NodeJS-mini-project#readme"
 }

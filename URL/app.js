@@ -1,11 +1,13 @@
-
-import { readFile } from 'fs/promises';
-import { writeFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import { createServer } from 'http';
 import crypto from 'crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import express from 'express';
+
+const app=express();
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -13,6 +15,7 @@ const __dirname = dirname(__filename);
 const PORT = 3005;
 const DATA_FILE = path.join(__dirname, "data", "links.json");
 const PUBLIC_DIR = path.join(__dirname, "public");
+app.use(express.static("public"));
 
 const serveFile = async (res, filePath, contentType) => {
     try {
@@ -24,7 +27,6 @@ const serveFile = async (res, filePath, contentType) => {
         res.end("404 page not found");
     }
 };
-
 
 const loadLinks = async () => {
     try {
@@ -39,11 +41,19 @@ const loadLinks = async () => {
     }
 };
 
-
 const saveLinks = async (links) => {
     await writeFile(DATA_FILE, JSON.stringify(links, null, 2));
 };
 
+app.get("/", async(res,req)=>{
+    try {
+       const file =await fs.readFile(path.join("views","index.html")) ;
+        const links= await loadLinks();
+    } catch (error) {
+        console.error(err);
+        return res.status(500).send(" Internal server error");
+    }
+})
 
 const server = createServer(async (req, res) => {
     if (req.method === "GET") {
@@ -52,21 +62,19 @@ const server = createServer(async (req, res) => {
         } else if (req.url === "/style.css") {
             return serveFile(res, path.join(PUBLIC_DIR, "style.css"), "text/css");
         } else if (req.url === '/links') {
-    try {
-        const links = await loadLinks();
-        
-        const entries = Object.entries(links);
-        const mostRecent = entries.length > 0 ? entries[entries.length - 1] : null;
-        
-        res.writeHead(200, { "Content-Type": "application/json" });
-        return res.end(JSON.stringify(mostRecent ? { 
-            [mostRecent[0]]: mostRecent[1] 
-        } : {}));
-    } catch (error) {
-        res.writeHead(500, { "Content-Type": "text/plain" });
-        return res.end("Internal Server Error");
-    }
-}
+            try {
+                const links = await loadLinks();
+                const entries = Object.entries(links);
+                const mostRecent = entries.length > 0 ? entries[entries.length - 1] : null;
+
+                res.writeHead(200, { "Content-Type": "application/json" });
+                return res.end(JSON.stringify(mostRecent ? {
+                    [mostRecent[0]]: mostRecent[1]
+                } : {}));
+            } catch (error) {
+                res.writeHead(500, { "Content-Type": "text/plain" });
+                return res.end("Internal Server Error");
+            }
         } else {
             const links = await loadLinks();
             const shortCode = req.url.slice(1);
@@ -106,8 +114,8 @@ const server = createServer(async (req, res) => {
                 await saveLinks(links);
 
                 res.writeHead(200, { "Content-Type": "application/json" });
-                res.end(JSON.stringify({ 
-                    success: true, 
+                res.end(JSON.stringify({
+                    success: true,
                     shortCode: finalShortCode,
                     shortUrl: `http://localhost:${PORT}/${finalShortCode}`
                 }));
@@ -120,7 +128,6 @@ const server = createServer(async (req, res) => {
     }
 });
 
-// Start the server
 server.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}`);
 });
