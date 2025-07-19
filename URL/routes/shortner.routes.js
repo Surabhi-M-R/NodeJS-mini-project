@@ -33,7 +33,14 @@ const saveLinks = async (links) => {
 };
 
 router.get("/report",(req,res)=>{
-    res.render("report");
+    const student=[
+        {name:"sush",grade:"BE",favSub:'CSE'},
+        {name:"sushv",grade:"BEe",favSub:'CSEe'},
+        {name:"sush",grade:"BE",favSub:'CSE'},
+        {name:"sush",grade:"BE",favSub:'CSE'}]
+        
+    
+    res.render("report",{student});
 })
 
 
