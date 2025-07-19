@@ -32,6 +32,13 @@ const saveLinks = async (links) => {
     await writeFile(DATA_FILE, JSON.stringify(links, null, 2));
 };
 
+router.get("/report",(req,res)=>{
+    res.render("report");
+})
+
+
+
+
 // Serve form and previously shortened links
 router.get("/", async (req, res) => {
     try {
