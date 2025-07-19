@@ -37,7 +37,8 @@ router.get("/report",(req,res)=>{
         {name:"sush",grade:"BE",favSub:'CSE'},
         {name:"sushv",grade:"BEe",favSub:'CSEe'},
         {name:"sush",grade:"BE",favSub:'CSE'},
-        {name:"sush",grade:"BE",favSub:'CSE'}]
+        {name:"sush",grade:"BE",favSub:'CSE'}
+    ]
         
     
     res.render("report",{student});
