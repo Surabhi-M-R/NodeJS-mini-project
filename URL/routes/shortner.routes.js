@@ -67,8 +67,9 @@ router.get('/', async (req, res) => {
             links: Object.entries(links).map(([code, url]) => ({
                 code,
                 url,
-                shortUrl: `${req.headers.host}/${code}`
-            }))
+                shortUrl: `${req.protocol}://${req.headers.host}/${code}` // Full URL with protocol
+            })),
+            baseUrl: `${req.protocol}://${req.headers.host}` // Pass base URL separately
         });
     } catch (err) {
         console.error(err);
@@ -103,18 +104,20 @@ router.post('/', async (req, res) => {
         res.status(500).render('error', { message: 'Internal Server Error' });
     }
 });
-
 // Redirect to the original URL
-router.get('/:code', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         const links = await loadLinks();
-        const code = req.params.code;
-
-        if (links[code]) {
-            return res.redirect(links[code]);
-        }
-
-        res.status(404).render('error', { message: 'Short URL not found' });
+        
+        res.render('index', {
+            recent: req.query.recent,
+            links: Object.entries(links).map(([code, url]) => ({
+                code,
+                url,
+                shortUrl: `${req.headers.host}/${code}` // Pre-calculate the full URL here
+            })),
+            host: req.headers.host // Pass the host separately if needed
+        });
     } catch (err) {
         console.error(err);
         res.status(500).render('error', { message: 'Internal Server Error' });

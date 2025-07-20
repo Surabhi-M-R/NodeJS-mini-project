@@ -12,7 +12,7 @@
         
         <% if (recent) { %>
             <div class="alert success">
-                <p>✅ Your shortened URL: <a href="/<%= recent %>"><%= shortUrl %></a></p>
+                <p>✅ Your shortened URL: <a href="/<%= recent %>"><%= baseUrl %>/<%= recent %></a></p>
             </div>
         <% } %>
 
@@ -29,14 +29,18 @@
         </form>
 
         <h2>Shortened URLs</h2>
-        <ul>
-            <% links.forEach(link => { %>
-                <li>
-                    <a href="/<%= link.code %>" target="_blank"><%= link.shortUrl %></a> - 
-                    <span><%= link.url %></span>
-                </li>
-            <% }); %>
-        </ul>
+        <% if (links && links.length) { %>
+            <ul>
+                <% links.forEach(link => { %>
+                    <li>
+                        <a href="/<%= link.code %>" target="_blank"><%= link.shortUrl %></a> - 
+                        <span><%= link.url %></span>
+                    </li>
+                <% }); %>
+            </ul>
+        <% } else { %>
+            <p>No shortened URLs yet.</p>
+        <% } %>
     </div>
 </body>
 </html>
