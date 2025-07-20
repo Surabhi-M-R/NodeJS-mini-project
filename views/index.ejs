@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>URL Shortener</h1>
+        
+        <% if (recent) { %>
+            <div class="alert success">
+                <p>✅ Your shortened URL: <a href="/<%= recent %>"><%= shortUrl %></a></p>
+            </div>
+        <% } %>
+
+        <form method="POST">
+            <div>
+                <label for="url">Enter URL:</label>
+                <input type="url" name="url" id="url" required placeholder="https://example.com">
+            </div>
+            <div>
+                <label for="shortCode">Custom short code (optional):</label>
+                <input type="text" name="shortCode" id="shortCode" placeholder="custom123">
+            </div>
+            <button type="submit">Shorten URL</button>
+        </form>
+
+        <h2>Shortened URLs</h2>
+        <ul>
+            <% links.forEach(link => { %>
+                <li>
+                    <a href="/<%= link.code %>" target="_blank"><%= link.shortUrl %></a> - 
+                    <span><%= link.url %></span>
+                </li>
+            <% }); %>
+        </ul>
+    </div>
+</body>
+</html>

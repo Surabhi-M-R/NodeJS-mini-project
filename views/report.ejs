@@ -2,23 +2,27 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Student Report</title>
 </head>
 <body>
-    <%- include('header') %>
-
-    <section class="report-section">
-        <h1>Student Report Card</h1>
-        <ul>
-            <% student.map((stud) => { %>
-                <li>
-                    <p>Name: <%= stud.name %></p>
-                    <p>Grade: <%= stud.grade %></p>
-                    <p>Favorite Subject: <%= stud.favSub %></p>
-                </li>
-            <% }) %> 
-        </ul>
-    </section>
+    <h1>Student Report</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Grade</th>
+                <th>Favorite Subject</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% students.forEach(student => { %>
+                <tr>
+                    <td><%= student.name %></td>
+                    <td><%= student.grade %></td>
+                    <td><%= student.favSub %></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
 </body>
 </html>
